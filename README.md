@@ -1,3 +1,5 @@
+> Unofficial SM-F966Q experimental variant. See [README-Q.ja.md](README-Q.ja.md). The upstream documentation follows.
+
 **Vibe-coded with GPT-6 Astra in Codex.**
 
 English | [日本語](README.ja.md)

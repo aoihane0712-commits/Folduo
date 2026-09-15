@@ -1,3 +1,5 @@
+> 非公式SM-F966Q試験版: 変更点と未検証事項は [README-Q.ja.md](README-Q.ja.md) を参照してください。以下は元の作者の説明です。
+
 **CodexのGPT-6 Astraでバイブコーディングしたアプリです。**
 
 [English](README.md) | 日本語

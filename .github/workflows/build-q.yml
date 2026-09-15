@@ -1,0 +1,46 @@
+name: Build Folduo Q Experimental
+on:
+  push:
+    branches: [main, 'codex/folduo-q']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0' 'platform-tools'
+      - name: Build, test and lint
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon :app:assembleRelease :app:testDebugUnitTest :app:lintRelease
+          python3 tools/build-wallpaper-helper.py
+      - name: Package install files
+        run: |
+          mkdir -p dist wallpaper-helper
+          cp app/build/outputs/apk/release/app-release.apk dist/Folduo-0.1.21-q1.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs dist/Folduo-0.1.21-q1.apk
+          cp tools/cover-wallpaper.py tools/cover-wallpaper-setup.jar LICENSE wallpaper-helper/
+          cp README-Q.ja.md dist/
+          (cd wallpaper-helper && zip -r ../dist/folduo-wallpaper-setup-q1.zip .)
+          (cd dist && sha256sum Folduo-0.1.21-q1.apk folduo-wallpaper-setup-q1.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Folduo-0.1.21-q1
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: folduo-build-reports
+          path: app/build/reports/
+          if-no-files-found: ignore
